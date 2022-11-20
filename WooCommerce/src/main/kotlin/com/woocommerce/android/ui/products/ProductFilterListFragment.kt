@@ -5,9 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,8 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class ProductFilterListFragment :
     BaseFragment(R.layout.fragment_product_filter_list),
     OnProductFilterClickListener,
-    BackPressListener,
-    MenuProvider {
+    BackPressListener {
     companion object {
         const val TAG = "ProductFilterListFragment"
     }
@@ -56,7 +53,7 @@ class ProductFilterListFragment :
 
         val binding = FragmentProductFilterListBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         setupObservers(viewModel)
 
         productFilterListAdapter = ProductFilterListAdapter(this)
@@ -85,20 +82,21 @@ class ProductFilterListFragment :
         }
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_clear, menu)
         clearAllMenuItem = menu.findItem(R.id.menu_clear)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_clear -> {
                 AnalyticsTracker.track(AnalyticsEvent.PRODUCT_FILTER_LIST_CLEAR_MENU_BUTTON_TAPPED)
                 viewModel.onClearFilterSelected()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

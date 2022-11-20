@@ -5,10 +5,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.woocommerce.android.R
@@ -34,7 +32,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProductDownloadDetailsFragment :
-    BaseFragment(R.layout.fragment_product_download_details), BackPressListener, MenuProvider {
+    BaseFragment(R.layout.fragment_product_download_details), BackPressListener {
     @Inject lateinit var uiMessageResolver: UIMessageResolver
 
     private val viewModel: ProductDownloadDetailsViewModel by viewModels()
@@ -50,7 +48,7 @@ class ProductDownloadDetailsFragment :
 
         _binding = FragmentProductDownloadDetailsBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         setupObservers(viewModel)
     }
 
@@ -59,7 +57,7 @@ class ProductDownloadDetailsFragment :
         _binding = null
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         if (navArgs.isEditing) {
             inflater.inflate(R.menu.menu_product_download_details, menu)
@@ -71,7 +69,7 @@ class ProductDownloadDetailsFragment :
         doneOrUpdateMenuItem.isVisible = viewModel.showDoneButton
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_done -> {
                 viewModel.onDoneOrUpdateClicked()
@@ -88,7 +86,7 @@ class ProductDownloadDetailsFragment :
                 viewModel.onDeleteButtonClicked()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

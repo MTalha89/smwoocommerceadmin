@@ -8,9 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle.State
 import com.woocommerce.android.R
 import com.woocommerce.android.databinding.FragmentLoginSiteCheckErrorBinding
 import com.woocommerce.android.ui.login.UnifiedLoginTracker.Click
@@ -20,7 +18,7 @@ import org.wordpress.android.login.LoginListener
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginSiteCheckErrorFragment : Fragment(R.layout.fragment_login_site_check_error), MenuProvider {
+class LoginSiteCheckErrorFragment : Fragment(R.layout.fragment_login_site_check_error) {
     companion object {
         const val TAG = "LoginGenericErrorFragment"
         const val ARG_SITE_ADDRESS = "SITE-ADDRESS"
@@ -51,7 +49,7 @@ class LoginSiteCheckErrorFragment : Fragment(R.layout.fragment_login_site_check_
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, State.RESUMED)
+        setHasOptionsMenu(true)
         activity?.title = getString(R.string.log_in)
 
         val binding = FragmentLoginSiteCheckErrorBinding.bind(view)
@@ -88,11 +86,12 @@ class LoginSiteCheckErrorFragment : Fragment(R.layout.fragment_login_site_check_
         }
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_login, menu)
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help) {
             unifiedLoginTracker.trackClick(Click.SHOW_HELP)
             loginListener?.helpSiteAddress(siteAddress)

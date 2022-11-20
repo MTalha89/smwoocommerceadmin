@@ -210,17 +210,9 @@ class ProductListViewModel @Inject constructor(
     }
 
     fun onSearchRequested() {
-        val searchFilter = if (viewState.isSkuSearch) {
-            AnalyticsTracker.VALUE_SEARCH_SKU
-        } else {
-            AnalyticsTracker.VALUE_SEARCH_ALL
-        }
         AnalyticsTracker.track(
             AnalyticsEvent.PRODUCT_LIST_SEARCHED,
-            mapOf(
-                AnalyticsTracker.KEY_SEARCH to viewState.query,
-                AnalyticsTracker.KEY_SEARCH_FILTER to searchFilter
-            )
+            mapOf(AnalyticsTracker.KEY_SEARCH to viewState.query)
         )
         refreshProducts()
     }
@@ -270,7 +262,7 @@ class ProductListViewModel @Inject constructor(
                         isSkeletonShown = !loadMore,
                         isEmptyViewVisible = false,
                         displaySortAndFilterCard = false,
-                        isAddProductButtonVisible = false,
+                        isAddProductButtonVisible = false
                     )
                     fetchProductList(
                         viewState.query,
@@ -395,8 +387,7 @@ class ProductListViewModel @Inject constructor(
             productRepository.searchProductList(
                 searchQuery = searchQuery,
                 isSkuSearch = isSkuSearch,
-                loadMore = loadMore,
-                productFilterOptions = productFilterOptions
+                loadMore = loadMore
             )?.let { products ->
                 // make sure the search query hasn't changed while the fetch was processing
                 if (searchQuery == productRepository.lastSearchQuery &&
@@ -480,8 +471,6 @@ class ProductListViewModel @Inject constructor(
     ) : Parcelable {
         @IgnoredOnParcel
         val isBottomNavBarVisible = isSearchActive != true
-        @IgnoredOnParcel
-        val isFilteringActive = filterCount != null && filterCount > 0
     }
 
     sealed class ProductListEvent : Event() {

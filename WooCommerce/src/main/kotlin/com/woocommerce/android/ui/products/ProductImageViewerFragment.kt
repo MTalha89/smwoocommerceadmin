@@ -69,6 +69,8 @@ class ProductImageViewerFragment :
         super.onCreate(savedInstanceState)
 
         remoteMediaId = savedInstanceState?.getLong(KEY_REMOTE_MEDIA_ID) ?: navArgs.mediaId
+
+        setHasOptionsMenu(false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

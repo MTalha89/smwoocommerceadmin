@@ -37,11 +37,6 @@
             android:authorities="${applicationId}.leakcanary-installer"
             android:exported="false" />
 
-        <activity
-            android:name="com.woocommerce.android.iapshowcase.IAPShowcaseActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Woo" />
-
     </application>
 
 </manifest>

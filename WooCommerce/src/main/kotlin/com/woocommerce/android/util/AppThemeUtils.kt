@@ -3,6 +3,7 @@ package com.woocommerce.android.util
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Configuration
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.woocommerce.android.AppPrefs
@@ -25,10 +26,10 @@ object AppThemeUtils {
             ThemeOption.DARK ->
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             ThemeOption.DEFAULT -> {
-                if (SystemVersionUtils.isAtLeastQ()) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                } else {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }
             }
         }

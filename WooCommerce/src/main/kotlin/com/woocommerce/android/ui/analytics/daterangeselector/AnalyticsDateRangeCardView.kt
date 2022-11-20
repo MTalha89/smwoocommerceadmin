@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import com.google.android.material.card.MaterialCardView
 import com.woocommerce.android.databinding.AnalyticsDateRangeCardViewBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AnalyticsDateRangeCardView @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet? = null,
@@ -14,8 +16,8 @@ class AnalyticsDateRangeCardView @JvmOverloads constructor(
 ) : MaterialCardView(ctx, attrs, defStyleAttr) {
     val binding = AnalyticsDateRangeCardViewBinding.inflate(LayoutInflater.from(ctx), this)
 
-    fun setOnClickListener(onClickListener: ((view: View) -> Unit)) {
-        binding.root.setOnClickListener(onClickListener)
+    fun setCalendarClickListener(onClickListener: ((view: View) -> Unit)) {
+        binding.btnDateRangeSelector.setOnClickListener(onClickListener)
     }
 
     fun updateFromText(fromDatePeriod: String) {

@@ -522,6 +522,20 @@ class AppPrefsTest {
     }
 
     @Test
+    fun givenSetUserSeenNewFeatureOnMoreScreenThenReturnsTrue() {
+        AppPrefs.setUserSeenNewFeatureOnMoreScreen()
+
+        assertThat(AppPrefs.isUserSeenNewFeatureOnMoreScreen()).isTrue
+    }
+
+    @Test
+    fun givenSetPaymentsIconWasClickedOnMoreScreenThenReturnsTrue() {
+        AppPrefs.setPaymentsIconWasClickedOnMoreScreen()
+
+        assertThat(AppPrefs.isPaymentsIconWasClickedOnMoreScreen()).isTrue
+    }
+
+    @Test
     fun givenUpsellCardReaderBannerDismissedForeverThenReturnTrue() {
         AppPrefs.setCardReaderUpsellBannerDismissedForever(
             isDismissed = true,

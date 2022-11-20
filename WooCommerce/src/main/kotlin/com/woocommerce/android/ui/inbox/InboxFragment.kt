@@ -63,7 +63,7 @@ class InboxFragment : BaseFragment(), MenuProvider {
                 viewModel.dismissAllNotes()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

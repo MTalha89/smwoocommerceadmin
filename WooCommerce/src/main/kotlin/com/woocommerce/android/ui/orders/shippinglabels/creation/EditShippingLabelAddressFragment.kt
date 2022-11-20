@@ -39,7 +39,6 @@ import com.woocommerce.android.ui.orders.shippinglabels.creation.EditShippingLab
 import com.woocommerce.android.ui.orders.shippinglabels.creation.ShippingLabelAddressSuggestionFragment.Companion.SELECTED_ADDRESS_ACCEPTED
 import com.woocommerce.android.ui.orders.shippinglabels.creation.ShippingLabelAddressSuggestionFragment.Companion.SELECTED_ADDRESS_TO_BE_EDITED
 import com.woocommerce.android.ui.searchfilter.SearchFilterItem
-import com.woocommerce.android.util.ActivityUtils.dialPhoneNumber
 import com.woocommerce.android.util.UiHelpers
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.Exit
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.ExitWithResult
@@ -265,7 +264,7 @@ class EditShippingLabelAddressFragment :
                     findNavController().navigateSafely(action)
                 }
                 is OpenMapWithAddress -> launchMapsWithAddress(event.address)
-                is DialPhoneNumber -> dialPhoneNumber(requireContext(), event.phoneNumber)
+                is DialPhoneNumber -> dialPhoneNumber(event.phoneNumber)
                 else -> event.isHandled = false
             }
         }
@@ -305,6 +304,16 @@ class EditShippingLabelAddressFragment :
             startActivity(mapIntent)
         } catch (e: ActivityNotFoundException) {
             ToastUtils.showToast(context, R.string.error_no_gmaps_app)
+        }
+    }
+
+    private fun dialPhoneNumber(phone: String) {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse("tel:$phone")
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            ToastUtils.showToast(context, R.string.error_no_phone_app)
         }
     }
 

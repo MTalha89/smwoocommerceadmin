@@ -5,10 +5,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.woocommerce.android.R
@@ -26,10 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ShippingCustomsFragment :
-    BaseFragment(R.layout.fragment_shipping_customs),
-    BackPressListener,
-    MenuProvider {
+class ShippingCustomsFragment : BaseFragment(R.layout.fragment_shipping_customs), BackPressListener {
     companion object {
         const val EDIT_CUSTOMS_CLOSED = "edit_customs_closed"
         const val EDIT_CUSTOMS_RESULT = "edit_customs_result"
@@ -48,19 +43,23 @@ class ShippingCustomsFragment :
         )
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
         inflater.inflate(R.menu.menu_done, menu)
         doneMenuItem = menu.findItem(R.id.menu_done)
         doneMenuItem.isVisible = viewModel.viewStateData.liveData.value?.canSubmitForm ?: false
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_done -> {
                 viewModel.onDoneButtonClicked()
                 true
             }
-            else -> false
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
     }
 
@@ -68,9 +67,7 @@ class ShippingCustomsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
+        setHasOptionsMenu(true)
         val binding = FragmentShippingCustomsBinding.bind(view)
         binding.packagesList.apply {
             this.adapter = customsAdapter
@@ -86,31 +83,33 @@ class ShippingCustomsFragment :
 
     private fun setupObservers(binding: FragmentShippingCustomsBinding) {
         viewModel.viewStateData.observe(
-            viewLifecycleOwner
-        ) { old, new ->
-            new.customsPackages.takeIfNotEqualTo(old?.customsPackages) { customsPackages ->
-                customsAdapter.customsPackages = customsPackages
-            }
-            new.canSubmitForm.takeIfNotEqualTo(old?.canSubmitForm) { canSubmitForm ->
-                if (::doneMenuItem.isInitialized) {
-                    doneMenuItem.isVisible = canSubmitForm
+            viewLifecycleOwner,
+            { old, new ->
+                new.customsPackages.takeIfNotEqualTo(old?.customsPackages) { customsPackages ->
+                    customsAdapter.customsPackages = customsPackages
+                }
+                new.canSubmitForm.takeIfNotEqualTo(old?.canSubmitForm) { canSubmitForm ->
+                    if (::doneMenuItem.isInitialized) {
+                        doneMenuItem.isVisible = canSubmitForm
+                    }
+                }
+                new.isProgressViewShown.takeIfNotEqualTo(old?.isProgressViewShown) { show ->
+                    binding.progressView.isVisible = show
+                    binding.packagesList.isVisible = !show
                 }
             }
-            new.isProgressViewShown.takeIfNotEqualTo(old?.isProgressViewShown) { show ->
-                binding.progressView.isVisible = show
-                binding.packagesList.isVisible = !show
-            }
-        }
+        )
         viewModel.event.observe(
-            viewLifecycleOwner
-        ) { event ->
-            when (event) {
-                is ExitWithResult<*> -> navigateBackWithResult(EDIT_CUSTOMS_RESULT, event.data)
-                is Exit -> navigateBackWithNotice(EDIT_CUSTOMS_CLOSED)
-                is ShowSnackbar -> uiMessageResolver.showSnack(event.message)
-                else -> event.isHandled = false
+            viewLifecycleOwner,
+            { event ->
+                when (event) {
+                    is ExitWithResult<*> -> navigateBackWithResult(EDIT_CUSTOMS_RESULT, event.data)
+                    is Exit -> navigateBackWithNotice(EDIT_CUSTOMS_CLOSED)
+                    is ShowSnackbar -> uiMessageResolver.showSnack(event.message)
+                    else -> event.isHandled = false
+                }
             }
-        }
+        )
     }
 
     override fun onRequestAllowBackPress(): Boolean {

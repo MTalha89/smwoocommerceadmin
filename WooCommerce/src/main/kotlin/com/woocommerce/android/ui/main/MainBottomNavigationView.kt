@@ -17,6 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView.OnItemReselectedListener
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener
 import com.woocommerce.android.R
+import com.woocommerce.android.util.FeatureFlag
 import java.lang.ref.WeakReference
 
 class MainBottomNavigationView @JvmOverloads constructor(
@@ -47,6 +48,7 @@ class MainBottomNavigationView @JvmOverloads constructor(
 
         addTopDivider()
         createBadges()
+        updateVisibilities()
 
         assignNavigationListeners(true)
         val weakReference = WeakReference(this)
@@ -114,6 +116,11 @@ class MainBottomNavigationView @JvmOverloads constructor(
         moreMenuBadge.isVisible = true
     }
 
+    fun showMoreMenuNewFeatureBadge() {
+        moreMenuBadge.backgroundColor = ContextCompat.getColor(context, R.color.color_secondary)
+        moreMenuBadge.isVisible = true
+    }
+
     fun hideMoreMenuBadge() {
         moreMenuBadge.isVisible = false
     }
@@ -148,6 +155,12 @@ class MainBottomNavigationView @JvmOverloads constructor(
     private fun assignNavigationListeners(assign: Boolean) {
         setOnItemSelectedListener(if (assign) this else null)
         setOnItemReselectedListener(if (assign) this else null)
+    }
+
+    private fun updateVisibilities() {
+        if (FeatureFlag.ANALYTICS_HUB.isEnabled()) {
+            menu.findItem(R.id.analytics).isVisible = true
+        }
     }
 
     private fun NavDestination.matchDestination(@IdRes destId: Int): Boolean =

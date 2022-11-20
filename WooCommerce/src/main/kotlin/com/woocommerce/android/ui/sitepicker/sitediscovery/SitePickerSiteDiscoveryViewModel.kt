@@ -9,8 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsEvent
 import com.woocommerce.android.analytics.AnalyticsTrackerWrapper
-import com.woocommerce.android.experiment.JetpackInstallationExperiment
-import com.woocommerce.android.experiment.JetpackInstallationExperiment.JetpackInstallationVariant
 import com.woocommerce.android.ui.login.AccountRepository
 import com.woocommerce.android.ui.sitepicker.SitePickerRepository
 import com.woocommerce.android.viewmodel.MultiLiveEvent
@@ -44,8 +42,7 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
     private val sitePickRepository: SitePickerRepository,
     private val accountRepository: AccountRepository,
     private val resourceProvider: ResourceProvider,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val jetpackInstallationExperiment: JetpackInstallationExperiment
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ScopedViewModel(savedStateHandle) {
     companion object {
         private const val FETCHED_URL_KEY = "fetched_url"
@@ -137,7 +134,7 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
                 primaryButtonAction = {
                     fetchedSiteUrl.let { url ->
                         requireNotNull(url)
-                        triggerEvent(StartWebBasedJetpackInstallation(url))
+                        triggerEvent(StartJetpackInstallation(url))
                     }
                 },
                 secondaryButtonText = resourceProvider.getString(R.string.login_try_another_account),
@@ -163,13 +160,6 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
     }
 
     private suspend fun startSiteDiscovery() {
-        // If the site is already connected to the account, go back to site picker
-        if (sitePickRepository.getSiteBySiteUrl(siteAddressFlow.value) != null) {
-            fetchedSiteUrl = siteAddressFlow.value
-            navigateBackToSitePicker()
-            return
-        }
-
         sitePickRepository.fetchSiteInfo(siteAddressFlow.value).fold(
             onSuccess = {
                 val siteAddress = (it.urlAfterRedirects ?: it.url)
@@ -186,38 +176,11 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
                     )
                 )
 
-                // TODO simplify the checks when the jetpack installation experiment is over
                 when {
                     !it.exists -> inlineErrorFlow.value = R.string.invalid_site_url_message
                     !it.isWordPress -> stepFlow.value = Step.NotWordpress
-                    !it.isWPCom && !it.isJetpackActive -> {
-                        jetpackInstallationExperiment.activate()
-                        if (jetpackInstallationExperiment.getCurrentVariant() == JetpackInstallationVariant.NATIVE) {
-                            triggerEvent(
-                                StartNativeJetpackActivation(
-                                    siteAddress = siteAddress,
-                                    isJetpackInstalled = false
-                                )
-                            )
-                        } else {
-                            stepFlow.value = Step.JetpackUnavailable
-                        }
-                    }
-                    !it.isWPCom -> {
-                        // This means a self-hosted site that has Jetpack and yet wasn't included in the user's sites
-                        // So start the Jetpack connection flow
-                        jetpackInstallationExperiment.activate()
-                        if (jetpackInstallationExperiment.getCurrentVariant() == JetpackInstallationVariant.NATIVE) {
-                            triggerEvent(
-                                StartNativeJetpackActivation(
-                                    siteAddress = siteAddress,
-                                    isJetpackInstalled = true
-                                )
-                            )
-                        } else {
-                            navigateToJetpackConnectionError()
-                        }
-                    }
+                    !it.isWPCom && (!it.hasJetpack || !it.isJetpackConnected) ->
+                        stepFlow.value = Step.JetpackUnavailable
                     else -> navigateBackToSitePicker()
                 }
             },
@@ -239,21 +202,10 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
         navigateBackToSitePicker()
     }
 
-    fun onJetpackConnected() {
-        navigateBackToSitePicker()
-    }
-
     private fun navigateBackToSitePicker() {
         fetchedSiteUrl.let { url ->
             requireNotNull(url)
             triggerEvent(ExitWithResult(url))
-        }
-    }
-
-    private fun navigateToJetpackConnectionError() {
-        fetchedSiteUrl.let { url ->
-            requireNotNull(url)
-            triggerEvent(ShowJetpackConnectionError(url))
         }
     }
 
@@ -300,11 +252,5 @@ class SitePickerSiteDiscoveryViewModel @Inject constructor(
 
     object CreateZendeskTicket : MultiLiveEvent.Event()
     object NavigateToHelpScreen : MultiLiveEvent.Event()
-    data class StartWebBasedJetpackInstallation(val siteAddress: String) : MultiLiveEvent.Event()
-    data class StartNativeJetpackActivation(
-        val siteAddress: String,
-        val isJetpackInstalled: Boolean
-    ) : MultiLiveEvent.Event()
-
-    data class ShowJetpackConnectionError(val siteAddress: String) : MultiLiveEvent.Event()
+    data class StartJetpackInstallation(val siteAddress: String) : MultiLiveEvent.Event()
 }

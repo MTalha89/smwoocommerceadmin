@@ -6,9 +6,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.StringRes
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import com.woocommerce.android.R
 import com.woocommerce.android.databinding.FragmentVariationsBulkUpdatePriceBinding
 import com.woocommerce.android.extensions.filterNotNull
@@ -31,9 +29,7 @@ import java.math.BigDecimal
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class VariationsBulkUpdatePriceFragment :
-    BaseFragment(R.layout.fragment_variations_bulk_update_price),
-    MenuProvider {
+class VariationsBulkUpdatePriceFragment : BaseFragment(R.layout.fragment_variations_bulk_update_price) {
     @Inject lateinit var uiMessageResolver: UIMessageResolver
     @Inject lateinit var currencyFormatter: CurrencyFormatter
 
@@ -47,17 +43,12 @@ class VariationsBulkUpdatePriceFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         _binding = FragmentVariationsBulkUpdatePriceBinding.bind(view)
         binding.price.value.filterNotNull().observe(viewLifecycleOwner) { viewModel.onPriceEntered(it.toString()) }
         binding.price.editText.showKeyboardWithDelay()
         observeViewStateChanges()
         observeEvents()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun observeEvents() {
@@ -137,18 +128,18 @@ class VariationsBulkUpdatePriceFragment :
         }
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_variations_bulk_update, menu)
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.done -> {
                 viewModel.onDoneClicked()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

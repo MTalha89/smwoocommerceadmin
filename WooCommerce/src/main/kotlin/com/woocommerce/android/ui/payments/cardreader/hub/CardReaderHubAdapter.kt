@@ -35,7 +35,9 @@ class CardReaderHubAdapter :
             VIEW_TYPE_HEADER -> {
                 CardReaderHubViewHolder.HeaderViewHolder(parent)
             }
-            else -> error("Unknown section")
+            else -> {
+                throw error("Unknown section")
+            }
         }
     }
 

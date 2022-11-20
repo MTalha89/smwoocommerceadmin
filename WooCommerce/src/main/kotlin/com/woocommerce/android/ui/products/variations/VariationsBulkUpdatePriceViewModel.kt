@@ -2,7 +2,6 @@ package com.woocommerce.android.ui.products.variations
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsEvent.PRODUCT_VARIANTS_BULK_UPDATE_REGULAR_PRICE_DONE_TAPPED
 import com.woocommerce.android.analytics.AnalyticsEvent.PRODUCT_VARIANTS_BULK_UPDATE_SALE_PRICE_DONE_TAPPED
@@ -53,7 +52,7 @@ class VariationsBulkUpdatePriceViewModel @Inject constructor(
         track(getDoneClickedAnalyticsEvent())
 
         viewState = viewState.copy(isProgressDialogShown = true)
-        viewModelScope.launch(dispatchers.io) {
+        launch(dispatchers.io) {
             val productId = variationsToUpdate.first().remoteProductId
             val variationsIds = variationsToUpdate.map { it.remoteVariationId }
             val result = when (viewState.priceType) {

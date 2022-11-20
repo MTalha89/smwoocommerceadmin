@@ -1,8 +1,11 @@
 package com.woocommerce.android.widgets
 
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Parcel
 import android.os.Parcelable
 import android.view.View.BaseSavedState
+import androidx.annotation.RequiresApi
 import com.woocommerce.android.extensions.parcelable
 
 /**
@@ -17,10 +20,19 @@ class WCSavedState : BaseSavedState {
         savedState = inState
     }
 
+    /**
+     * Workaround to differentiate between this method and the one that requires API 24+ because
+     * the super(source, loader) method won't work on older APIs - thus the app will crash.
+     */
+    constructor(source: Parcel, loader: ClassLoader?, superState: Parcelable?) : super(superState) {
+        savedState = source.parcelable(loader)
+    }
+
     constructor(source: Parcel) : super(source) {
         savedState = source.parcelable(this::class.java.classLoader)
     }
 
+    @RequiresApi(VERSION_CODES.N)
     constructor(source: Parcel, loader: ClassLoader?) : super(source, loader) {
         savedState = loader?.let {
             source.parcelable(it)
@@ -37,7 +49,11 @@ class WCSavedState : BaseSavedState {
         @JvmField
         val CREATOR = object : Parcelable.ClassLoaderCreator<WCSavedState> {
             override fun createFromParcel(source: Parcel, loader: ClassLoader?): WCSavedState {
-                return WCSavedState(source, loader)
+                return if (VERSION.SDK_INT >= VERSION_CODES.N) {
+                    WCSavedState(source, loader)
+                } else {
+                    WCSavedState(source, loader, source.parcelable(loader))
+                }
             }
 
             override fun createFromParcel(source: Parcel): WCSavedState {

@@ -7,9 +7,10 @@ import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.woocommerce.android.config.FirebaseRemoteConfigRepository.Companion.PROLOGUE_VARIANT_KEY
+import com.woocommerce.android.experiment.PrologueExperiment.PrologueVariant
 import com.woocommerce.android.util.runAndCaptureValues
 import com.woocommerce.android.viewmodel.BaseUnitTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -18,15 +19,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FirebaseRemoteConfigRepositoryTests : BaseUnitTest() {
     private val remoteConfig = mock<FirebaseRemoteConfig>()
     private val crashLogging = mock<CrashLogging>()
 
     lateinit var repository: FirebaseRemoteConfigRepository
-
-    private val testKey = "key"
-    private val testValue = "value"
 
     suspend fun setup(prepareMocks: suspend () -> Unit = {}) {
         prepareMocks()
@@ -58,11 +55,11 @@ class FirebaseRemoteConfigRepositoryTests : BaseUnitTest() {
         setup {
             whenever(remoteConfig.fetchAndActivate())
                 .thenReturn(StaticTask(true))
-            whenever(remoteConfig.getString(testKey))
-                .thenReturn(testValue)
+            whenever(remoteConfig.getString(PROLOGUE_VARIANT_KEY))
+                .thenReturn(PrologueVariant.CONTROL.name)
         }
 
-        val values = repository.observeStringRemoteValue(testKey).runAndCaptureValues {
+        val values = repository.observePrologueVariant().runAndCaptureValues {
             repository.fetchRemoteConfig()
         }
 
@@ -75,11 +72,11 @@ class FirebaseRemoteConfigRepositoryTests : BaseUnitTest() {
             setup {
                 whenever(remoteConfig.fetchAndActivate())
                     .thenReturn(StaticTask(false))
-                whenever(remoteConfig.getString(testKey))
-                    .thenReturn(testValue)
+                whenever(remoteConfig.getString(PROLOGUE_VARIANT_KEY))
+                    .thenReturn(PrologueVariant.CONTROL.name)
             }
 
-            val values = repository.observeStringRemoteValue(testKey).runAndCaptureValues {
+            val values = repository.observePrologueVariant().runAndCaptureValues {
                 repository.fetchRemoteConfig()
             }
 

@@ -15,7 +15,6 @@ import com.woocommerce.android.cardreader.internal.payments.actions.CreatePaymen
 import com.woocommerce.android.cardreader.internal.wrappers.PaymentIntentParametersFactory
 import com.woocommerce.android.cardreader.internal.wrappers.TerminalWrapper
 import com.woocommerce.android.cardreader.payments.PaymentInfo
-import com.woocommerce.android.cardreader.payments.StatementDescriptor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
@@ -433,7 +432,7 @@ internal class CreatePaymentActionTest : CardReaderBaseUnitTest() {
             siteUrl = siteUrl,
             orderKey = orderKey,
             countryCode = countryCode,
-            statementDescriptor = StatementDescriptor(statementDescriptor),
+            statementDescriptor = statementDescriptor,
             feeAmount = feeAmount,
         )
 }

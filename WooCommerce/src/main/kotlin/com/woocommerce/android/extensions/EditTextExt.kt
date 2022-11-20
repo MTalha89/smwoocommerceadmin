@@ -1,9 +1,10 @@
 package com.woocommerce.android.extensions
 
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.view.View
 import android.view.autofill.AutofillManager
 import android.widget.EditText
-import com.woocommerce.android.util.SystemVersionUtils
 import org.wordpress.android.util.ActivityUtils
 
 /**
@@ -19,7 +20,7 @@ fun EditText.showKeyboardWithDelay(delayMs: Long = DEFAULT_KEYBOARD_DELAY) {
 }
 
 fun EditText.requestPasswordAutoFillWithDelay(delayMs: Long = DEFAULT_AUTOFILL_DELAY) {
-    if (SystemVersionUtils.isAtLeastO()) {
+    if (VERSION.SDK_INT >= VERSION_CODES.O) {
         setAutofillHints(View.AUTOFILL_HINT_PASSWORD)
         importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
         val af = context.getSystemService(AutofillManager::class.java)

@@ -1,7 +1,6 @@
 package com.woocommerce.android.ui.sitepicker
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
@@ -33,8 +32,15 @@ class SitePickerAdapter(
         private const val NON_WOO_SITE_TYPE = 2
     }
 
+    private var hasMultipleSites: Boolean = false
+
     init {
         setHasStableIds(true)
+    }
+
+    override fun submitList(list: List<SitesListItem>?) {
+        hasMultipleSites = (list?.count { it is WooSiteUiModel || it is NonWooSiteUiModel } ?: 0) > 1
+        super.submitList(list)
     }
 
     override fun getItemId(position: Int): Long {
@@ -99,11 +105,13 @@ class SitePickerAdapter(
     private inner class WooSiteViewHolder(val viewBinding: SitePickerItemBinding) :
         RecyclerView.ViewHolder(viewBinding.root) {
         init {
+            viewBinding.radio.isClickable = false
             viewBinding.warningIcon.isVisible = false
         }
 
         fun bind(siteUiModel: WooSiteUiModel) {
-            viewBinding.checkIcon.visibility = if (siteUiModel.isSelected) View.VISIBLE else View.INVISIBLE
+            viewBinding.radio.isVisible = hasMultipleSites
+            viewBinding.radio.isChecked = siteUiModel.isSelected
             viewBinding.textSiteName.text = siteUiModel.site.getSiteName()
             viewBinding.textSiteDomain.text = StringUtils.getSiteDomainAndPath(siteUiModel.site)
 
@@ -116,7 +124,7 @@ class SitePickerAdapter(
     private inner class NonWooSiteViewHolder(val viewBinding: SitePickerItemBinding) :
         RecyclerView.ViewHolder(viewBinding.root) {
         init {
-            viewBinding.checkIcon.isVisible = false
+            viewBinding.radio.isVisible = false
             viewBinding.warningIcon.isVisible = true
         }
 

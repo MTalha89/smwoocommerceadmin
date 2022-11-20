@@ -8,7 +8,6 @@ import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsEvent
 import com.woocommerce.android.analytics.AnalyticsTracker
 import com.woocommerce.android.model.Order
-import com.woocommerce.android.util.ActivityUtils
 import org.wordpress.android.util.ToastUtils
 import java.util.Locale
 
@@ -22,7 +21,7 @@ object OrderCustomerHelper {
     fun createEmail(
         context: Context,
         order: Order,
-        email: String
+        emailAddr: String
     ) {
         AnalyticsTracker.track(
             AnalyticsEvent.ORDER_CONTACT_ACTION,
@@ -33,12 +32,17 @@ object OrderCustomerHelper {
             )
         )
 
-        ActivityUtils.sendEmail(context, email) { error ->
+        val intent = Intent(Intent.ACTION_SENDTO)
+        intent.data = Uri.parse("mailto:$emailAddr") // only email apps should handle this
+        try {
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
             AnalyticsTracker.track(
                 AnalyticsEvent.ORDER_CONTACT_ACTION_FAILED,
                 this.javaClass.simpleName,
-                error.javaClass.simpleName, "No e-mail app was found"
+                e.javaClass.simpleName, "No e-mail app was found"
             )
+
             ToastUtils.showToast(context, R.string.error_no_email_app)
         }
     }
@@ -57,12 +61,17 @@ object OrderCustomerHelper {
             )
         )
 
-        ActivityUtils.dialPhoneNumber(context, phone) { error ->
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse("tel:$phone")
+        try {
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
             AnalyticsTracker.track(
                 AnalyticsEvent.ORDER_CONTACT_ACTION_FAILED,
                 this.javaClass.simpleName,
-                error.javaClass.simpleName, "No phone app was found"
+                e.javaClass.simpleName, "No phone app was found"
             )
+
             ToastUtils.showToast(context, R.string.error_no_phone_app)
         }
     }

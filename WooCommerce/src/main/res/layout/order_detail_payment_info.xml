@@ -252,7 +252,8 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
                     tools:itemCount="3"
-                    tools:listitem="@layout/order_detail_refund_payment_item" />
+                    tools:listitem="@layout/order_detail_refund_payment_item"
+                    tools:targetApi="lollipop" />
 
                 <!-- Refund total -->
                 <LinearLayout

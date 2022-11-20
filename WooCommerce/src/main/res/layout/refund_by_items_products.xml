@@ -15,7 +15,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:itemCount="3"
-        tools:listitem="@layout/refunds_product_list_item" />
+        tools:listitem="@layout/refunds_product_list_item"
+        tools:targetApi="lollipop" />
 
     <View
         android:id="@+id/issueRefund_dividerBelowList"

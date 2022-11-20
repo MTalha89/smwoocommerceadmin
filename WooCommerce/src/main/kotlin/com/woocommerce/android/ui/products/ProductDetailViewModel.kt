@@ -14,6 +14,7 @@ import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsEvent
 import com.woocommerce.android.analytics.AnalyticsTracker
 import com.woocommerce.android.analytics.AnalyticsTracker.Companion.KEY_HAS_LINKED_PRODUCTS
+import com.woocommerce.android.di.ExperimentationModule
 import com.woocommerce.android.extensions.addNewItem
 import com.woocommerce.android.extensions.clearList
 import com.woocommerce.android.extensions.containsItem
@@ -83,6 +84,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import org.wordpress.android.fluxc.model.experiments.Variation
+import org.wordpress.android.fluxc.store.ExperimentStore
 import org.wordpress.android.fluxc.store.WCProductStore.ProductErrorType
 import java.math.BigDecimal
 import java.util.Collections
@@ -105,7 +108,8 @@ class ProductDetailViewModel @Inject constructor(
     private val variationRepository: VariationRepository,
     private val mediaFileUploadHandler: MediaFileUploadHandler,
     private val appPrefsWrapper: AppPrefsWrapper,
-    private val addonRepository: AddonRepository
+    private val addonRepository: AddonRepository,
+    private val experimentStore: ExperimentStore
 ) : ScopedViewModel(savedState) {
     companion object {
         private const val KEY_PRODUCT_PARAMETERS = "key_product_parameters"
@@ -140,6 +144,9 @@ class ProductDetailViewModel @Inject constructor(
     private val draftChanges = MutableStateFlow<Product?>(null)
 
     private val storedProduct = MutableStateFlow<Product?>(null)
+
+    // A/B test to determine whether to show the linked products promo
+    private var abTestLinkProductsPromoIsTreatment = false
 
     // view state for the product categories screen
     val productCategoriesViewStateData = LiveDataDelegate(savedState, ProductCategoriesViewState())
@@ -284,6 +291,13 @@ class ProductDetailViewModel @Inject constructor(
     }
 
     fun start() {
+        experimentStore.getCachedAssignments()
+            ?.variations
+            ?.get(ExperimentationModule.AB_TEST_LINKED_PRODUCTS_PROMO.identifier)
+            ?.let {
+                abTestLinkProductsPromoIsTreatment = it is Variation.Treatment
+            }
+
         val isRestoredFromSavedState = viewState.productDraft != null
         if (!isRestoredFromSavedState) {
             initializeViewState()
@@ -1630,7 +1644,8 @@ class ProductDetailViewModel @Inject constructor(
      * doesn't already have linked products
      */
     private fun checkLinkedProductPromo() {
-        if (appPrefsWrapper.isPromoBannerShown(PromoBannerType.LINKED_PRODUCTS).not() &&
+        if (abTestLinkProductsPromoIsTreatment &&
+            appPrefsWrapper.isPromoBannerShown(PromoBannerType.LINKED_PRODUCTS).not() &&
             viewState.productDraft?.hasLinkedProducts() == false
         ) {
             appPrefsWrapper.setPromoBannerShown(PromoBannerType.LINKED_PRODUCTS, true)

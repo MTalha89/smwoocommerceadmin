@@ -5,8 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper.DOWN
 import androidx.recyclerview.widget.ItemTouchHelper.UP
@@ -23,9 +21,7 @@ import com.woocommerce.android.widgets.DraggableItemTouchHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProductDownloadsFragment :
-    BaseProductFragment(R.layout.fragment_product_downloads_list),
-    MenuProvider {
+class ProductDownloadsFragment : BaseProductFragment(R.layout.fragment_product_downloads_list) {
     private val itemTouchHelper by lazy {
         DraggableItemTouchHelper(
             dragDirs = UP or DOWN,
@@ -58,7 +54,7 @@ class ProductDownloadsFragment :
 
         _binding = FragmentProductDownloadsListBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         setupObservers(viewModel)
 
         with(binding.productDownloadsRecycler) {
@@ -73,18 +69,19 @@ class ProductDownloadsFragment :
         _binding = null
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_product_downloads_list, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_product_downloads_settings -> {
                 viewModel.onDownloadsSettingsClicked()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

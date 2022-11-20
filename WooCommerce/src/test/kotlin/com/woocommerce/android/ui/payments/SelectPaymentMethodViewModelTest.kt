@@ -9,7 +9,6 @@ import com.woocommerce.android.analytics.AnalyticsTrackerWrapper
 import com.woocommerce.android.initSavedStateHandle
 import com.woocommerce.android.model.Order
 import com.woocommerce.android.model.OrderMapper
-import com.woocommerce.android.model.UiString
 import com.woocommerce.android.tools.NetworkStatus
 import com.woocommerce.android.tools.SelectedSite
 import com.woocommerce.android.ui.payments.SelectPaymentMethodViewModel.NavigateBackToHub
@@ -28,7 +27,6 @@ import com.woocommerce.android.ui.payments.cardreader.onboarding.CardReaderFlowP
 import com.woocommerce.android.ui.payments.cardreader.onboarding.CardReaderFlowParam.PaymentOrRefund.Refund
 import com.woocommerce.android.ui.payments.cardreader.payment.CardReaderPaymentCollectibilityChecker
 import com.woocommerce.android.util.CurrencyFormatter
-import com.woocommerce.android.util.UtmProvider
 import com.woocommerce.android.util.captureValues
 import com.woocommerce.android.viewmodel.BaseUnitTest
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.ShowDialog
@@ -91,7 +89,6 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
     }
     private val analyticsTrackerWrapper: AnalyticsTrackerWrapper = mock()
     private val bannerDisplayEligibilityChecker: BannerDisplayEligibilityChecker = mock()
-    private val selectPaymentUtmProvider: UtmProvider = mock()
 
     @Test
     fun `given hub flow, when view model init, then navigate to hub flow emitted`() = testBlocking {
@@ -609,9 +606,6 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             ).thenReturn(
                 "${AppUrls.WOOCOMMERCE_PURCHASE_CARD_READER_IN_COUNTRY}US"
             )
-            whenever(selectPaymentUtmProvider.getUrlWithUtmParams(any())).thenReturn(
-                "${AppUrls.WOOCOMMERCE_PURCHASE_CARD_READER_IN_COUNTRY}US"
-            )
             whenever(cardPaymentCollectibilityChecker.isCollectable(order)).thenReturn(true)
             whenever(
                 bannerDisplayEligibilityChecker.canShowCardReaderUpsellBanner(anyLong())
@@ -808,13 +802,7 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             val title = (viewModel.viewStateData.value as Success).bannerState.title
 
             // THEN
-            assertThat(title).isEqualTo(
-                UiString.UiStringRes(
-                    stringRes = R.string.card_reader_upsell_card_reader_banner_title,
-                    params = emptyList(),
-                    containsHtml = false
-                )
-            )
+            assertThat(title).isEqualTo(R.string.card_reader_upsell_card_reader_banner_title)
         }
 
     @Test
@@ -832,13 +820,7 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             val description = (viewModel.viewStateData.value as Success).bannerState.description
 
             // THEN
-            assertThat(description).isEqualTo(
-                UiString.UiStringRes(
-                    stringRes = R.string.card_reader_upsell_card_reader_banner_description,
-                    params = emptyList(),
-                    containsHtml = false
-                )
-            )
+            assertThat(description).isEqualTo(R.string.card_reader_upsell_card_reader_banner_description)
         }
 
     @Test
@@ -856,13 +838,7 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             val primaryActionLabel = (viewModel.viewStateData.value as Success).bannerState.primaryActionLabel
 
             // THEN
-            assertThat(primaryActionLabel).isEqualTo(
-                UiString.UiStringRes(
-                    stringRes = R.string.card_reader_upsell_card_reader_banner_cta,
-                    params = emptyList(),
-                    containsHtml = false
-                )
-            )
+            assertThat(primaryActionLabel).isEqualTo(R.string.card_reader_upsell_card_reader_banner_cta)
         }
 
     @Test
@@ -880,13 +856,7 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             val chipLabel = (viewModel.viewStateData.value as Success).bannerState.chipLabel
 
             // THEN
-            assertThat(chipLabel).isEqualTo(
-                UiString.UiStringRes(
-                    stringRes = R.string.card_reader_upsell_card_reader_banner_new,
-                    params = emptyList(),
-                    containsHtml = false
-                )
-            )
+            assertThat(chipLabel).isEqualTo(R.string.card_reader_upsell_card_reader_banner_new)
         }
     //endregion
 
@@ -902,8 +872,7 @@ class SelectPaymentMethodViewModelTest : BaseUnitTest() {
             orderMapper,
             analyticsTrackerWrapper,
             cardPaymentCollectibilityChecker,
-            bannerDisplayEligibilityChecker,
-            selectPaymentUtmProvider
+            bannerDisplayEligibilityChecker
         )
     }
 }

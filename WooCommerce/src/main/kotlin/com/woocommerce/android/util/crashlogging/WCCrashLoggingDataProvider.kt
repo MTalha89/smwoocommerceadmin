@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.ThreadMode
 import org.wordpress.android.fluxc.Dispatcher
 import org.wordpress.android.fluxc.model.AccountModel
 import org.wordpress.android.fluxc.store.AccountStore
+import org.wordpress.android.fluxc.store.AccountStore.OnAccountChanged
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,9 +44,9 @@ class WCCrashLoggingDataProvider @Inject constructor(
 
     private val crashLoggingUser = MutableStateFlow(accountStore.account?.toCrashLoggingUser())
 
-    @Suppress("unused", "unused_parameter")
+    @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onAccountChanged(event: AccountStore.OnAccountChanged) {
+    fun onAccountChanged(event: OnAccountChanged) {
         appScope.launch {
             crashLoggingUser.emit(accountStore.account.toCrashLoggingUser())
         }

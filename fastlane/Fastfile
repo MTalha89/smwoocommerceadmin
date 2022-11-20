@@ -375,9 +375,7 @@ platform :android do
     skip_upload_changelogs: true,
     skip_upload_images: true,
     skip_upload_screenshots: true,
-    json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY,
-    # Retain the build for v10.9.2 which is the latest one supporting Android 5/6
-    version_codes_to_retain: [356],
+    json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
   )
 
   create_gh_release(version: version) if options[:create_release]
@@ -743,11 +741,11 @@ platform :android do
     android_firebase_test(
       project_id: firebase_secret(name: 'project_id'),
       key_file: GOOGLE_FIREBASE_SECRETS_PATH,
-      model: 'Pixel2.arm',
-      version: 30,
+      model: 'Pixel2',
+      version: 28,
       test_apk_path: File.join(apk_dir, 'androidTest', 'vanilla', 'debug', 'WooCommerce-vanilla-debug-androidTest.apk'),
       apk_path: File.join(apk_dir, 'vanilla', 'debug', 'WooCommerce-vanilla-debug.apk'),
-      test_targets: 'notPackage com.woocommerce.android.e2e.tests.screenshot',
+      test_targets: 'notPackage com.woocommerce.android.screenshots',
       results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
      )
   end
@@ -837,8 +835,7 @@ platform :android do
     upload_path = upload_to_s3(
       bucket: 'a8c-apps-public-artifacts',
       key: "woocommerce-installable-build-#{generate_installable_build_number}.apk",
-      file: lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
-      skip_if_exists: true
+      file: lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
     )
 
     install_url = "#{INSTALLABLE_BUILD_DOMAIN}/#{upload_path}"

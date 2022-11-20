@@ -33,7 +33,6 @@ import com.woocommerce.android.cardreader.payments.CardPaymentStatus.PaymentMeth
 import com.woocommerce.android.cardreader.payments.CardPaymentStatus.ProcessingPayment
 import com.woocommerce.android.cardreader.payments.CardPaymentStatus.ProcessingPaymentCompleted
 import com.woocommerce.android.cardreader.payments.PaymentInfo
-import com.woocommerce.android.cardreader.payments.StatementDescriptor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -637,7 +636,7 @@ class PaymentManagerTest : CardReaderBaseUnitTest() {
             storeName = storeName,
             siteUrl = siteUrl,
             orderKey = orderKey,
-            statementDescriptor = StatementDescriptor(statementDescriptor),
+            statementDescriptor = statementDescriptor,
             countryCode = countryCode,
             feeAmount = feeAmount,
         )

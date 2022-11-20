@@ -12,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
@@ -73,8 +72,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ProductDetailFragment :
     BaseProductFragment(R.layout.fragment_product_detail),
-    OnGalleryImageInteractionListener,
-    MenuProvider {
+    OnGalleryImageInteractionListener {
     companion object {
         private const val LIST_STATE_KEY = "list_state"
 
@@ -132,7 +130,7 @@ class ProductDetailFragment :
         super.onViewCreated(view, savedInstanceState)
 
         _binding = FragmentProductDetailBinding.bind(view)
-        requireActivity().addMenuProvider(this, viewLifecycleOwner)
+        setHasOptionsMenu(true)
 
         ViewCompat.setTransitionName(
             binding.root,
@@ -360,13 +358,13 @@ class ProductDetailFragment :
         }
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_product_detail_fragment, menu)
     }
 
     @SuppressLint("ResourceAsColor")
-    override fun onPrepareMenu(menu: Menu) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         // change the font color of the trash menu item to red, and only show it if it should be enabled
         with(menu.findItem(R.id.menu_trash_product)) {
             if (this == null) return@with
@@ -391,7 +389,7 @@ class ProductDetailFragment :
         }
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_publish -> {
                 ActivityUtils.hideKeyboard(activity)
@@ -430,7 +428,7 @@ class ProductDetailFragment :
                 true
             }
 
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

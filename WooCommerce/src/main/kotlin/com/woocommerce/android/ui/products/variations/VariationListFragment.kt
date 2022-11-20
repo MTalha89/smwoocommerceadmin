@@ -9,10 +9,8 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.annotation.StringRes
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -42,7 +40,6 @@ import com.woocommerce.android.ui.products.variations.VariationListViewModel.Sho
 import com.woocommerce.android.ui.products.variations.VariationListViewModel.ShowBulkUpdateAttrPicker
 import com.woocommerce.android.ui.products.variations.VariationListViewModel.ShowBulkUpdateLimitExceededWarning
 import com.woocommerce.android.ui.products.variations.VariationListViewModel.ShowVariationDetail
-import com.woocommerce.android.util.FeatureFlag
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.Exit
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.ExitWithResult
 import com.woocommerce.android.viewmodel.MultiLiveEvent.Event.ShowSnackbar
@@ -56,8 +53,7 @@ import javax.inject.Inject
 class VariationListFragment :
     BaseFragment(R.layout.fragment_variation_list),
     BackPressListener,
-    OnLoadMoreListener,
-    MenuProvider {
+    OnLoadMoreListener {
     companion object {
         const val TAG: String = "VariationListFragment"
         const val KEY_VARIATION_LIST_RESULT = "key_variation_list_result"
@@ -82,7 +78,7 @@ class VariationListFragment :
 
         _binding = FragmentVariationListBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         initializeViews(savedInstanceState)
         initializeViewModel()
     }
@@ -111,8 +107,6 @@ class VariationListFragment :
     }
 
     private fun initializeViews(savedInstanceState: Bundle?) {
-        binding.addAllVariationsButton.isVisible = FeatureFlag.GENERATE_ALL_VARIATIONS.isEnabled()
-
         val layoutManager = LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         this.layoutManager = layoutManager
 
@@ -288,23 +282,23 @@ class VariationListFragment :
         return false
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_variation_list_fragment, menu)
     }
 
-    override fun onPrepareMenu(menu: Menu) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         val isBatchUpdateEnabled = viewModel.viewStateLiveData.liveData.value?.isVariationsOptionsMenuEnabled ?: false
         menu.findItem(R.id.menu_bulk_update)?.isVisible = isBatchUpdateEnabled
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_bulk_update -> {
                 viewModel.onBulkUpdateClicked()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

@@ -6,9 +6,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.StringRes
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import com.woocommerce.android.R
 import com.woocommerce.android.databinding.FragmentShippingLabelCreateCustomPackageBinding
 import com.woocommerce.android.extensions.takeIfNotEqualTo
@@ -24,8 +22,7 @@ import org.wordpress.android.util.ActivityUtils
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ShippingLabelCreateCustomPackageFragment :
-    BaseFragment(R.layout.fragment_shipping_label_create_custom_package), MenuProvider {
+class ShippingLabelCreateCustomPackageFragment : BaseFragment(R.layout.fragment_shipping_label_create_custom_package) {
     @Inject lateinit var uiMessageResolver: UIMessageResolver
 
     private var progressDialog: CustomProgressDialog? = null
@@ -41,13 +38,18 @@ class ShippingLabelCreateCustomPackageFragment :
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentShippingLabelCreateCustomPackageBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
         initializeInputFields()
         setupObservers()
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
         inflater.inflate(R.menu.menu_done, menu)
     }
 
@@ -158,14 +160,14 @@ class ShippingLabelCreateCustomPackageFragment :
         progressDialog = null
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_done -> {
                 ActivityUtils.hideKeyboard(activity)
                 viewModel.onCustomFormDoneMenuClicked()
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

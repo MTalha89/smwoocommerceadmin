@@ -6,8 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,7 +24,7 @@ import com.woocommerce.android.widgets.CustomProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AttributeListFragment : BaseProductFragment(R.layout.fragment_attribute_list), MenuProvider {
+class AttributeListFragment : BaseProductFragment(R.layout.fragment_attribute_list) {
     companion object {
         const val TAG: String = "AttributeListFragment"
         private const val LIST_STATE_KEY = "list_state"
@@ -50,7 +48,7 @@ class AttributeListFragment : BaseProductFragment(R.layout.fragment_attribute_li
 
         _binding = FragmentAttributeListBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         initializeViews(savedInstanceState)
         setupObservers()
     }
@@ -68,7 +66,9 @@ class AttributeListFragment : BaseProductFragment(R.layout.fragment_attribute_li
         }
     }
 
-    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
         if (navArgs.isVariationCreation) {
             nextMenuItem = menu.add(Menu.FIRST, ID_ATTRIBUTE_LIST, Menu.FIRST, R.string.next).apply {
                 setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
@@ -77,14 +77,14 @@ class AttributeListFragment : BaseProductFragment(R.layout.fragment_attribute_li
         }
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             ID_ATTRIBUTE_LIST -> {
                 AttributeListFragmentDirections.actionAttributeListFragmentToAttributesAddedFragment()
                     .apply { findNavController().navigateSafely(this) }
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

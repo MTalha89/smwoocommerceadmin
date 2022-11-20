@@ -2,6 +2,7 @@ import io.github.wzieba.tracks.plugin.TracksExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id 'com.automattic.android.fetchstyle'
     id 'io.gitlab.arturbosch.detekt'
     id 'io.github.wzieba.tracks.plugin'
     id 'com.android.application' apply false
@@ -27,7 +28,8 @@ allprojects {
     tasks.withType(KotlinCompile).all {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_1_8
-            allWarningsAsErrors = true
+            // TODO fix all the warnings and change to true before end of 2022
+            allWarningsAsErrors = false
             freeCompilerArgs += [
                     "-Xopt-in=kotlin.RequiresOptIn",
                     "-Xjvm-default=all-compatibility",
@@ -42,7 +44,7 @@ subprojects {
     }
 }
 
-def detektAll = tasks.register("detektAll", io.gitlab.arturbosch.detekt.Detekt) {
+tasks.register("detektAll", io.gitlab.arturbosch.detekt.Detekt) {
     description = "Custom DETEKT build for all modules"
     parallel = true
     ignoreFailures = false
@@ -58,21 +60,6 @@ def detektAll = tasks.register("detektAll", io.gitlab.arturbosch.detekt.Detekt) 
         xml.enabled = true
         txt.enabled = false
     }
-}
-
-def detektAutoCorrectPrompt = tasks.register("detektAutoCorrectPrompt") {
-    doLast {
-        def detektTask = detektAll.get()
-        if (detektTask.state.failure != null && !detektTask.autoCorrect) {
-            println ".-----------------------------------------------------------------------------------------------------------------------------------.\n" +
-                    "| 🛠  Did you know: you can ask Detekt to automatically resolve some of the issues by running `./gradlew detektAll --auto-correct` |\n" +
-                    "'-----------------------------------------------------------------------------------------------------------------------------------'"
-        }
-    }
-}
-
-detektAll.configure{
-    finalizedBy detektAutoCorrectPrompt
 }
 
 dependencies {
@@ -95,14 +82,14 @@ tasks.register("installGitHooks", Copy) {
 }
 
 ext {
-    fluxCVersion = 'trunk-c3ad0bc80650a0297964ca7cae160807818236b8'
+    fluxCVersion = '1.54.0'
     glideVersion = '4.13.2'
     coilVersion = '2.1.0'
     constraintLayoutVersion = '1.2.0'
     libaddressinputVersion = '0.0.2'
     eventBusVersion = '3.3.1'
     googlePlayCoreVersion = '1.10.3'
-    coroutinesVersion = '1.6.4'
+    coroutinesVersion = '1.6.1'
     lifecycleVersion = '2.5.1'
     aztecVersion = 'v1.3.45'
     flipperVersion = '0.154.0'
@@ -112,16 +99,10 @@ ext {
     materialVersion = '1.6.1'
     hiltJetpackVersion = '1.0.0'
     wordPressUtilsVersion = '2.6.0'
-    mediapickerVersion = '0.1.1'
-    wordPressLoginVersion = '0.21.0'
+    mediapickerVersion = 'trunk-6d9cbe0b1a0f0f2163b6ab6e0e5b2aadc6511ddd'
+    wordPressLoginVersion = '0.20.0'
     aboutAutomatticVersion = '0.0.6'
     workManagerVersion = '2.7.1'
-    billingVersion = '5.0.0'
-
-    // Apache
-    commonsText = '1.10.0'
-    commonsIO = '2.11.0'
-    httpClientAndroidVersion = '4.3.5.1'
 
     // Compose and its module versions need to be consistent with each other (for example 'compose-theme-adapter')
     composeVersion = "1.1.1"

@@ -5,9 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsEvent
@@ -29,10 +27,7 @@ import org.wordpress.android.util.ActivityUtils
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddProductCategoryFragment :
-    BaseFragment(R.layout.fragment_add_product_category),
-    BackPressListener,
-    MenuProvider {
+class AddProductCategoryFragment : BaseFragment(R.layout.fragment_add_product_category), BackPressListener {
     companion object {
         const val ARG_ADDED_CATEGORY = "arg-added-category"
     }
@@ -60,20 +55,21 @@ class AddProductCategoryFragment :
         activity?.let { ActivityUtils.hideKeyboard(it) }
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.menu_done, menu)
+        super.onCreateOptionsMenu(menu, inflater)
         doneMenuItem = menu.findItem(R.id.menu_done)
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_done -> {
                 AnalyticsTracker.track(AnalyticsEvent.ADD_PRODUCT_CATEGORY_SAVE_TAPPED)
                 viewModel.addProductCategory(getCategoryName())
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -82,7 +78,7 @@ class AddProductCategoryFragment :
 
         _binding = FragmentAddProductCategoryBinding.bind(view)
 
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
         setupObservers(viewModel)
 
         binding.productCategoryName.setOnTextChangedListener {

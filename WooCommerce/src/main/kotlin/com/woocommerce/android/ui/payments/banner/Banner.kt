@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -32,9 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.woocommerce.android.R
-import com.woocommerce.android.model.UiString
 import com.woocommerce.android.ui.compose.theme.WooThemeWithBackground
-import com.woocommerce.android.util.UiHelpers
 
 @Composable
 fun Banner(bannerState: BannerState) {
@@ -91,14 +88,14 @@ fun Banner(bannerState: BannerState) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = UiHelpers.getTextOfUiString(LocalContext.current, bannerState.chipLabel),
+                            text = stringResource(id = bannerState.chipLabel),
                             color = colorResource(id = R.color.woo_purple_60),
                             style = MaterialTheme.typography.caption,
                             fontWeight = FontWeight.Bold,
                         )
                     }
                     Text(
-                        text = UiHelpers.getTextOfUiString(LocalContext.current, bannerState.title),
+                        text = stringResource(id = bannerState.title),
                         style = MaterialTheme.typography.subtitle1,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(
@@ -106,7 +103,7 @@ fun Banner(bannerState: BannerState) {
                         )
                     )
                     Text(
-                        text = UiHelpers.getTextOfUiString(LocalContext.current, bannerState.description),
+                        text = stringResource(id = bannerState.description),
                         style = MaterialTheme.typography.subtitle1,
                         modifier = Modifier.padding(
                             bottom = dimensionResource(id = R.dimen.minor_100)
@@ -122,7 +119,7 @@ fun Banner(bannerState: BannerState) {
                         onClick = bannerState.onPrimaryActionClicked
                     ) {
                         Text(
-                            text = UiHelpers.getTextOfUiString(LocalContext.current, bannerState.primaryActionLabel),
+                            text = stringResource(id = bannerState.primaryActionLabel),
                             color = colorResource(id = R.color.color_secondary),
                             style = MaterialTheme.typography.subtitle1,
                             fontWeight = FontWeight.Bold,
@@ -151,10 +148,10 @@ fun PaymentScreenBannerPreview() {
                 shouldDisplayBanner = true,
                 onPrimaryActionClicked = {},
                 onDismissClicked = {},
-                title = UiString.UiStringRes(R.string.card_reader_upsell_card_reader_banner_title),
-                description = UiString.UiStringRes(R.string.card_reader_upsell_card_reader_banner_description),
-                primaryActionLabel = UiString.UiStringRes(R.string.card_reader_upsell_card_reader_banner_cta),
-                chipLabel = UiString.UiStringRes(R.string.card_reader_upsell_card_reader_banner_new)
+                title = R.string.card_reader_upsell_card_reader_banner_title,
+                description = R.string.card_reader_upsell_card_reader_banner_description,
+                primaryActionLabel = R.string.card_reader_upsell_card_reader_banner_cta,
+                chipLabel = R.string.card_reader_upsell_card_reader_banner_new
             )
         )
     }

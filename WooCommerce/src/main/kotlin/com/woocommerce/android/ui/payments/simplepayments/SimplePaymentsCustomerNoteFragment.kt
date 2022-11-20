@@ -5,9 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.MenuProvider
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.navArgs
 import com.woocommerce.android.R
 import com.woocommerce.android.analytics.AnalyticsTracker
@@ -17,9 +15,7 @@ import com.woocommerce.android.ui.base.BaseFragment
 import org.wordpress.android.util.ActivityUtils
 import org.wordpress.android.util.DisplayUtils
 
-class SimplePaymentsCustomerNoteFragment :
-    BaseFragment(R.layout.fragment_order_create_edit_customer_note),
-    MenuProvider {
+class SimplePaymentsCustomerNoteFragment : BaseFragment(R.layout.fragment_order_create_edit_customer_note) {
     private var _binding: FragmentOrderCreateEditCustomerNoteBinding? = null
     val binding
         get() = _binding!!
@@ -29,7 +25,7 @@ class SimplePaymentsCustomerNoteFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        setHasOptionsMenu(true)
 
         _binding = FragmentOrderCreateEditCustomerNoteBinding.bind(view)
         if (savedInstanceState == null) {
@@ -60,14 +56,15 @@ class SimplePaymentsCustomerNoteFragment :
         _binding = null
     }
 
-    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
         inflater.inflate(R.menu.menu_done, menu)
         doneMenuItem = menu.findItem(R.id.menu_done)
         doneMenuItem.isEnabled = hasChanges()
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_done -> {
                 navigateBackWithResult(
@@ -76,7 +73,7 @@ class SimplePaymentsCustomerNoteFragment :
                 )
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

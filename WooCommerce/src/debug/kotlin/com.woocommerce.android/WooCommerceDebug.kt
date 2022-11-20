@@ -19,7 +19,9 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class WooCommerceDebug : WooCommerce() {
     override fun onCreate() {
-        if (FlipperUtils.shouldEnableFlipper(this)) {
+        if (FlipperUtils.shouldEnableFlipper(this) &&
+            SystemVersionUtils.isAtLeastM()
+        ) {
             SoLoader.init(this, false)
             AndroidFlipperClient.getInstance(this).apply {
                 addPlugin(InspectorFlipperPlugin(applicationContext, DescriptorMapping.withDefaults()))
@@ -29,7 +31,7 @@ class WooCommerceDebug : WooCommerce() {
             }.start()
         }
         super.onCreate()
-        enableStrictMode()
+        //enableStrictMode()
     }
 
     /**

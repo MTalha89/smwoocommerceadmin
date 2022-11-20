@@ -155,9 +155,8 @@ class CardReaderPaymentDialogFragment : DialogFragment(R.layout.card_reader_paym
     }
 
     private fun composeEmail(address: String, subject: UiString, content: UiString) {
-        ActivityUtils.sendEmail(requireActivity(), address, subject, content) {
-            viewModel.onEmailActivityNotFound()
-        }
+        val success = ActivityUtils.composeEmail(requireActivity(), address, subject, content)
+        if (!success) viewModel.onEmailActivityNotFound()
     }
 
     override fun onResume() {

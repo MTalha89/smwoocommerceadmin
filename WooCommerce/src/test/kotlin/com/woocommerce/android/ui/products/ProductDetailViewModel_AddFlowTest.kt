@@ -16,6 +16,7 @@ import com.woocommerce.android.ui.products.categories.ProductCategoriesRepositor
 import com.woocommerce.android.ui.products.models.ProductProperty.ComplexProperty
 import com.woocommerce.android.ui.products.models.ProductProperty.Editable
 import com.woocommerce.android.ui.products.models.ProductProperty.PropertyGroup
+import com.woocommerce.android.ui.products.models.ProductProperty.RatingBar
 import com.woocommerce.android.ui.products.models.ProductPropertyCard
 import com.woocommerce.android.ui.products.models.SiteParameters
 import com.woocommerce.android.ui.products.tags.ProductTagsRepository
@@ -105,7 +106,7 @@ class ProductDetailViewModel_AddFlowTest : BaseUnitTest() {
     private val defaultPricingGroup: Map<String, String> =
         mapOf("" to resources.getString(R.string.product_price_empty))
 
-    private val addNewProductExpectedCards = listOf(
+    private val expectedCards = listOf(
         ProductPropertyCard(
             type = ProductPropertyCard.Type.PRIMARY,
             properties = listOf(
@@ -125,6 +126,12 @@ class ProductDetailViewModel_AddFlowTest : BaseUnitTest() {
                     defaultPricingGroup,
                     R.drawable.ic_gridicons_money,
                     showTitle = false
+                ),
+                RatingBar(
+                    R.string.product_reviews,
+                    resources.getString(R.string.product_ratings_count_zero),
+                    0F,
+                    R.drawable.ic_reviews
                 ),
                 PropertyGroup(
                     R.string.product_inventory,
@@ -166,7 +173,8 @@ class ProductDetailViewModel_AddFlowTest : BaseUnitTest() {
                 variationRepository,
                 mediaFileUploadHandler,
                 prefs,
-                addonRepository
+                addonRepository,
+                experimentStore = mock()
             )
         )
 
@@ -184,7 +192,7 @@ class ProductDetailViewModel_AddFlowTest : BaseUnitTest() {
     }
 
     @Test
-    fun `Displays the product detail properties correctly in add new product flow`() = testBlocking {
+    fun `Displays the product detail properties correctly`() = testBlocking {
         viewModel.productDetailViewStateData.observeForever { _, _ -> }
 
         var cards: List<ProductPropertyCard>? = null
@@ -192,7 +200,9 @@ class ProductDetailViewModel_AddFlowTest : BaseUnitTest() {
             cards = it.map { card -> productUtils.stripCallbacks(card) }
         }
 
-        assertThat(cards).isEqualTo(addNewProductExpectedCards)
+        viewModel.start()
+
+        assertThat(cards).isEqualTo(expectedCards)
     }
 
     @Test
